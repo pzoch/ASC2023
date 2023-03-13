@@ -2,8 +2,7 @@ rm(list=ls())
 require(ggplot2)
 require(dyn)
 require(zoo)
-require(Cairo)
-CairoWin()
+
 ####################################
 # Random walk with a drift         #
 # y[t] = mu + y[t-1] + e[t]        #

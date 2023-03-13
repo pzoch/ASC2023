@@ -12,7 +12,7 @@ require(data.table)
 require(dynlm)
 require(lmtest)
 # load data
-input_dir  = "D:/Dropbox (Personal)/WNE/ASC_2023/data/"
+input_dir  = "C:/users/Piotr/Dropbox/WNE/ASC_2023/data/"
 
 data_pl     = read.csv(file = paste0(input_dir, "GDP_POLAND.csv"))
 colnames(data_pl) = c("date","Y")
@@ -85,16 +85,18 @@ summary(ur.df(y_short, type="trend", lags=4))
 summary(ur.df(dy_short, type="drift", lags=4))
 
 # BG test - ADF
-reg_df = dynlm(dy ~ lag(y) - 1) 
+reg_df = dynlm(dy ~ lag(y,-1) - 1) 
 summary(reg_df)
 resid  = zoo(resid(reg_df), data_pl$date)
 
 acf(coredata(resid), lag.max = 12, plot = TRUE)
 pacf(coredata(resid), lag.max = 12, plot = TRUE)
-bgtest(dy ~ lag(y) - 1,order = 1)
-bgtest(dy ~ lag(y) - 1,order = 2)
-bgtest(dy ~ lag(y) - 1,order = 3)
-bgtest(dy ~ lag(y) - 1,order = 4)
+
+
+bgtest(reg_df,order = 1)
+bgtest(reg_df,order = 2)
+bgtest(reg_df,order = 3)
+bgtest(reg_df,order = 4)
 
 
 # Test KPSS

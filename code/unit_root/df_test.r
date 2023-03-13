@@ -26,6 +26,7 @@ ts.plot(x)
 ########################################
 dx <- diff(x) 
 
+ts.plot(dx)
 df_test1 <- ur.df(x, type="none", lags=0)
 ts.plot(df_test1@res)
 
