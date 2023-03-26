@@ -49,26 +49,30 @@ pacf(coredata(y), lag.max = 12, plot = TRUE)
 # Test ADF
 ########################################
 summary(ur.df(y, type="none", lags=4))
-summary(ur.df(y, type="drift", lags=4))
-summary(ur.df(y, type="trend", lags=4))
+summary(ur.df(y, type="drift", lags=5))
+summary(ur.df(y, type="trend", lags=5))
 summary(ur.df(dy, type="drift", lags=4))
 
+
 # BG test - ADF
-reg_df = dynlm(zoo(dy) ~ L(zoo(y),1) - 1) 
-reg_df = dynlm(zoo(dy) ~ lag(zoo(y),-1) - 1) 
+# create "t" 
+time = difftime(temp$date,min(temp$date), units = "weeks")
 
+# need to specify regression manually - add as many lags of dy and as many deterministic regressors as in ur.df (line 53)
+# line 63 runs the same regression as line 53 (we add time trend and an intercept (intercept is included automatically in R, if you want to get rid of it add "-1" in the formula))
+reg_df = dynlm(zoo(dy) ~ L(zoo(y),1) + time + L(zoo(dy),1) +  L(zoo(dy),2) + L(zoo(dy),3) +  L(zoo(dy),4) + L(zoo(dy),5))
+# line 65 verifies  if it is indeed the same regression - compare coefficients
 summary(reg_df)
+# now check for autocorrelation of residuals, first some plots
 resid  = zoo(resid(reg_df), agg_data$date)
-
-acf(coredata(resid), lag.max = 12, plot = TRUE)
-
 acf(coredata(resid), lag.max = 12, plot = TRUE)
 pacf(coredata(resid), lag.max = 12, plot = TRUE)
-
+# here Breusch-Godfrey test
 bgtest(reg_df,order = 1)
 bgtest(reg_df,order = 2)
 bgtest(reg_df,order = 3)
 bgtest(reg_df,order = 4)
+bgtest(reg_df,order = 12)
 
 # Test KPSS
 ########################################
