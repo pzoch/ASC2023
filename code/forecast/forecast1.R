@@ -1,17 +1,16 @@
 rm(list=ls())
 
 require(zoo)
-require(eurostat)
 require(ggfortify)
 require(forecast)
 require(smooth)
 require(pracma)
 require(TSstudio)
 require(tidyverse)
+require(dplyr)
 
 # load data
-input_dir  = "D:/Dropbox (Personal)/WNE/ASC_2023/data/"
-
+input_dir  = "C:/users/Piotr/Dropbox/WNE/ASC_2023/data/"
 data_pl     = read.csv(file = paste0(input_dir, "GDP_POLAND.csv"))
 colnames(data_pl) = c("date","Y")
 
@@ -46,18 +45,14 @@ autoplot(GDP_forecast.naive)
 # plot without CIs
 autoplot(data_train, series = "Train data") + 
   autolayer(GDP_forecast.naive$mean, series = "Point forecast") +
-  autolayer(data_test, series = "Test data") +
+ autolayer(data_test, series = "Test data") + 
   xlab("Date") + 
   ylab("GDP growth")
-
-
 
 #### MEAN FORECASTS
 GDP_forecast.mean <-  meanf(data_train, h=length(data_test))
 summary(GDP_forecast.mean)
 autoplot(GDP_forecast.mean)
-
-
 
 ### Accuracy of these silly forecasts
 accuracy(GDP_forecast.naive,data_test)
@@ -101,10 +96,8 @@ smoothing = smoothing %>%
   smoothing %>%
     gather(metric, value, dlogY:dlogY_ma10) %>%
     ggplot(aes(date, value, color = metric)) +
-    geom_line() +
-    coord_cartesian(xlim = c(as.Date("2018-01-01"),as.Date("2021-01-01")))
-  
-
+    geom_line() 
+    
   
 ### forecast   
 # moving average - forecast
