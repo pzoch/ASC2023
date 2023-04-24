@@ -9,7 +9,7 @@ require(pracma)
 require(TSstudio)
 
 # load data
-input_dir  = "D:/Dropbox (Personal)/WNE/ASC_2023/data/"
+input_dir  = "C:/users/Piotr/Dropbox/WNE/ASC_2023/data/"
 data_us     = read.csv(file = paste0(input_dir, "CPI_US_NSA.csv"))
 colnames(data_us) = c("date","Pi")
 
@@ -46,8 +46,8 @@ checkresiduals(f_ses)
 
 
 # use holt-winters from now on
-data_test <- window(Pi, start = c(2018, 1),end = c(2018, 4))
-data_train   <- window(Pi, end = c(2017, 4))
+data_test <- window(Pi, start = c(2018, 1),end = c(2018, 12))
+data_train   <- window(Pi, end = c(2017, 12))
 f_hw1    <- hw((data_train), h=12,"alpha"=0.45,"beta"=0.1,"gamma"=0.50,seasonal="additive")
 f_hw2    <- hw((data_train), h=12,"alpha"=0.25,"beta"=0.1,"gamma"=0.50,seasonal="additive")
 f_hw3    <- hw((data_train), h=12,"alpha"=0.15,"beta"=0.1,"gamma"=0.50,seasonal="additive")
@@ -60,16 +60,22 @@ autoplot(f_hw1) +
   ylab("Inflation") + xlab("Year")
 
 checkresiduals(f_hw1)
+f_hw_opt    <- hw((data_train), h=12,seasonal="multiplicative")
+checkresiduals(f_hw_opt)
+
 
 accuracy(f_hw1, data_test)
 accuracy(f_hw2, data_test)
 accuracy(f_hw3, data_test)
+accuracy(f_hw_opt, data_test)
 accuracy(f_naive, data_test)
 accuracy(f_snaive, data_test)
 
 # time series cross-test
 
 errors_tsCV <- tsCV(data_train, forecastfunction=hw, h=1,"alpha"=0.45,"beta"=0.1,"gamma"=0.50,seasonal="additive")
+
+
 errors_base <- residuals(hw(data_train, h=1,"alpha"=0.45,"beta"=0.1,"gamma"=0.50,seasonal="additive"))
 
 rmse_tsCV <- sqrt(mean(errors_tsCV^2, na.rm=TRUE))
