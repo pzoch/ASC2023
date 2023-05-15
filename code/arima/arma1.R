@@ -16,9 +16,9 @@ time = 1:1000
 ma_vec_1 = c(1,1,1,1)
 ma_vec_2 = c(-1,2,-3,4)
 ma_vec_3 = c(2,1,0.5,0.2)
-y1 <- data.table(time = 950:1000,y=arima.sim(model = list(ma = ma_vec_1), n = 1000,sd = 1))
-y2 <- data.table(time = 950:1000,y=arima.sim(model = list(ma = ma_vec_2), n = 1000,sd = 1))
-y3 <- data.table(time = 950:1000,y=arima.sim(model = list(ma = ma_vec_3), n = 1000,sd = 1))
+y1 <- data.table(time = 1:1000,y=arima.sim(model = list(ma = ma_vec_1), n = 1000,sd = 1))
+y2 <- data.table(time = 1:1000,y=arima.sim(model = list(ma = ma_vec_2), n = 1000,sd = 1))
+y3 <- data.table(time = 1:1000,y=arima.sim(model = list(ma = ma_vec_3), n = 1000,sd = 1))
 
 
 ggplot(y1,aes(time,y))+geom_line(aes(color="MA VEC 1"))+
@@ -40,9 +40,9 @@ time = 1:1000
 ar_vec_1 = c(0.5,0,0,0)
 ar_vec_2 = c(0.4,0.2,0.1,0.05)
 ar_vec_3 = c(-0.3,0.2,-0.1,0.05)
-z1 <- data.table(time = 950:1000,z=arima.sim(model = list(ar = ar_vec_1), n = 1000,sd = 1))
-z2 <- data.table(time = 950:1000,z=arima.sim(model = list(ar = ar_vec_2), n = 1000,sd = 1))
-z3 <- data.table(time = 950:1000,z=arima.sim(model = list(ar = ar_vec_3), n = 1000,sd = 1))
+z1 <- data.table(time = 1:1000,z=arima.sim(model = list(ar = ar_vec_1), n = 1000,sd = 1))
+z2 <- data.table(time = 1:1000,z=arima.sim(model = list(ar = ar_vec_2), n = 1000,sd = 1))
+z3 <- data.table(time = 1:1000,z=arima.sim(model = list(ar = ar_vec_3), n = 1000,sd = 1))
 
 
 ggplot(z1,aes(time,z))+geom_line(aes(color="AR VEC 1"))+
@@ -72,6 +72,7 @@ y_arma <-arima.sim(model = list(ma = ma_vec, ar = ar_vec),n=100,sd = 1)
   pacf(y_arma,lag.max=12)     
 
 model  <- arima(y_arma, order = c(2,0,3), method = "ML")
+
 resids <- model$residuals
   par(mfrow=c(1,2))
   acf(resids,lag.max=12) 
@@ -111,16 +112,44 @@ roots
 IRF <- ARMAtoMA(ar = ar.coef,ma = ma.coef,24)
 plot.ts(IRF)
 
-
 # information criteria
+
 model_aic = auto.arima(y_arma,max.d=0,max.p=4,max.q=4,ic="aic")
 model_bic = auto.arima(y_arma,max.d=0,max.p=4,max.q=4,ic="bic")
-model12  <- arima(y_arma, order = c(1,0,2), method = "ML")  
+model32  <- arima(y_arma, order = c(3,0,2), method = "ML")  
+model23  <- arima(y_arma, order = c(2,0,3), method = "ML")  
+
+ar_aic.coef <- model_aic[["coef"]][1:1]
+ma_aic.coef <- model_aic[["coef"]][2:3]
+
+ar_bic.coef <- c(0)
+ma_bic.coef <- model_bic[["coef"]][1:2]
+
+ar_32.coef <- model32[["coef"]][1:3]
+ma_32.coef <- model32[["coef"]][4:5]
+
+ar_23.coef <- model23[["coef"]][1:2]
+ma_23.coef <- model23[["coef"]][3:5]
+
+
+
 resids  <- model12$residuals
 coeftest(model12)
 Box.test(resids,lag=12, type="Ljung-Box",fitdf = 1 + 2)
 checkresiduals(model12)
+
 #MA representation
+IRF_aic <- ARMAtoMA(ar = ar_aic.coef,ma = ma_aic.coef,24)
+IRF_bic <- ARMAtoMA(ar = ar_bic.coef,ma = ma_bic.coef,24)
+IRF_23 <- ARMAtoMA(ar = ar_23.coef,ma = ma_23.coef,24)
+IRF_true <- ARMAtoMA(ar = ar_vec,ma = ma_vec,24)
+
+
+par(mfrow=c(1,4))
+plot.ts(IRF_aic)
+plot.ts(IRF_bic)
+plot.ts(IRF_23)
+plot.ts(IRF_true)
 
 IRF_ic <- ARMAtoMA(ar = 0,ma = ma.coef,24)
 plot.ts(IRF_ic)

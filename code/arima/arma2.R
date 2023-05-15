@@ -9,7 +9,7 @@ require(data.table)
 require(dynlm)
 require(lmtest)
 # load data
-input_dir  = "D:/Dropbox (Personal)/WNE/ASC_2023/data/"
+input_dir  =  "C:/users/Piotr/Dropbox/WNE/ASC_2023/data/"
 
 data_pl     = read.csv(file = paste0(input_dir, "GDP_POLAND.csv"))
 colnames(data_pl) = c("date","Y")
@@ -43,7 +43,7 @@ autoplot(data_training.dlogY)
 
   # is there a problem?
 
-  model  <- arima(data_training.dlogY, order = c(3,0,0), method = "ML")
+  model  <- arima(data_training.dlogY, order = c(4,0,4), method = "ML")
   
   # more specifications
   model_plusar  <- arima(data_training.dlogY, order = c(4,0,0), method = "ML")
@@ -66,8 +66,8 @@ autoplot(data_training.dlogY)
   
   # try with AIC etc
   # information criteria
-  model_aic = auto.arima(data_training.dlogY,max.d=0,max.p=4,max.q=4,ic="aic",seasonal = FALSE)
-  model_bic = auto.arima(data_training.dlogY,max.d=0,max.p=4,max.q=4,ic="bic",seasonal = FALSE)
+  model_aic = auto.arima(data_training.dlogY,max.d=0,max.p=8,max.q=8,ic="aic",seasonal = FALSE)
+  model_bic = auto.arima(data_training.dlogY,max.d=0,max.p=8,max.q=8,ic="bic",seasonal = FALSE)
 
   checkresiduals(model_aic)
   checkresiduals(model_bic)
@@ -75,20 +75,20 @@ autoplot(data_training.dlogY)
   
   
   # general to specific modeling
-  model_general  <- arima(data_training.dlogY, order = c(4,0,1), method = "ML")
-  model_specific  <- arima(data_training.dlogY, order = c(3,0,0), method = "ML")
+  model_general  <- arima(data_training.dlogY, order = c(4,0,4), method = "ML")
+  model_specific  <- arima(data_training.dlogY, order = c(2,0,3), method = "ML")
   lgen = logLik(model_general)
   lspec =logLik(model_specific)
   dfs <- length(coef(model_general)) - length(coef(model_specific))
   teststat<--2*(as.numeric(lspec-lgen))
   pchisq(teststat,df=dfs,lower.tail=FALSE)
   
-  
+  checkresiduals(model_specific)
   ### conclusion? ###
 
   
-ar.coef <- model[["coef"]][1:3]
-ma.coef = NULL
+ar.coef <- model_specific[["coef"]][1:2]
+ma.coef <- model_specific[["coef"]][3:5]
 
 #MA representation
 par(mfrow=c(1,1))
@@ -98,5 +98,5 @@ plot.ts(IRF)
 
 
 # forecasts
-autoplot(forecast(model,h=4))
+autoplot(forecast(model_specific,h=4))
 
