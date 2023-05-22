@@ -69,4 +69,4 @@ autoplot(forecast(model_s_bic,h=4)) + autolayer(dlogY)
 
 model  <- arima(data_training.dlogY, order = c(1,0,1), method = "ML")
 autoplot(forecast(model,h=4)) + autolayer(dlogY)
-
+accuracy(model_s)
