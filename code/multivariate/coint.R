@@ -61,7 +61,7 @@ autoplot(ts(uhat))
 
 # testing unit root
 testX <-(ur.df(X, type="none", lags=0))
-testY <-(ur.df(Y, type="none", lags=0))
+testY <-(ur.df(Y, type="none", lags=4))
 summary(testX)
 summary(testY)
 
@@ -99,7 +99,7 @@ autoplot(dataNP)
 # test for unit root
 testM <-(ur.df(m, type="drift", lags=1))
 testP <-(ur.df(p, type="drift", lags=1))
-summary(testW)
+summary(testM)
 summary(testP)
 
 uhat <- resid(lm( m ~ p))
@@ -154,6 +154,8 @@ testC <-(ur.df(C, type="drift", lags=1))
 testY <-(ur.df(Y, type="drift", lags=1))
 summary(testC)
 summary(testY)
-coint.test(C,Y,nlag=2)
+coint.test(C,Y,nlag=4)
 summary(ca.jo(UKdata))
 
+lm(C ~ Y)
+summary(lm(diff(C) ~ diff(Y)-1))

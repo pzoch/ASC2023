@@ -121,8 +121,8 @@ HEGY_test <- hegy.test(dlAP, deterministic = c(1,1,1),lag.method = c("AIC"), max
 CH_test <- ch.test(dlAP,  type ="trigonometric", sid ="all",lag1=TRUE)
 
 
-df_test3 <- ur.df(x, type="drift", lags=0)
-df_test4 <- ur.df(x, type="trend", lags=0)
+df_test3 <- ur.df(dlAP, type="drift", lags=0)
+df_test4 <- ur.df(dlAP, type="trend", lags=0)
 
 
 dSlAP <- diff(lAP,12)
@@ -135,6 +135,7 @@ spec.pgram(coredata(dSlAP),log='no',span=5)
 HEGY_test <- hegy.test(dSlAP, deterministic = c(1,1,1),lag.method = c("AIC"), maxlag = 24)
 CH_test <- ch.test(dSlAP,  type ="trigonometric", sid ="all",lag1=TRUE)
 
+df_test5 <- ur.df(dSlAP, type="trend", lags=12)
 
 ddSlAP <- diff(dlAP,12)
 autoplot(ddSlAP)
