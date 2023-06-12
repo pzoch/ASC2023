@@ -27,14 +27,14 @@ tempY <- na.omit(ts(rev(tempY$values),start = c(2000, 1), frequency =12))
 tempP <- subset(datasetP, geo == c("PL") & coicop=="CP00" & unit=="I15") 
 tempP <- na.omit(ts(rev(tempP$values),start = c(1997, 1), frequency =12))
 
-Y    <- window(log(tempY),start = c(2002, 1), end = c(2019, 12))
-P    <- window(log(tempP),start = c(2002, 1), end = c(2019, 12))
+Y    <- window(100*diff(log(tempY)),start = c(2002, 1), end = c(2019, 12))
+P    <- window(100*diff(log(tempP)),start = c(2002, 1), end = c(2019, 12))
 
 
 data <- (cbind(Y,P))
 autoplot(data)
 
-VAR <- VAR(data, p=12, type="trend")
+VAR <- VAR(data, p=12, type="both")
 summary(VAR)
 
 Bcoef(VAR)
@@ -42,7 +42,7 @@ Acoef(VAR)
 
 
 # Select lags
-VARselect(data, lag.max=24, type="trend")
+VARselect(data, lag.max=24, type="both")
 
 # Check restrictions - we create our own function
 LLtest <- function(varS, varL, df){
@@ -51,13 +51,13 @@ LLtest <- function(varS, varL, df){
   return(list(stat=as.numeric(d), prob = as.numeric(p))) 
 }
 
-VAR_12  <- VAR(data, p=12, type="trend")
-VAR_13  <- VAR(data,  p=13, type="trend")
+VAR_11  <- VAR(data, p=11, type="trend")
+VAR_12  <- VAR(data,  p=12, type="trend")
 
 
 LLtest(VAR_12, VAR_13, 12)
 
-VAR_IC = VAR_13
+VAR_IC = VAR_12
 # residuals
 par(mfrow=c(2,2), cex = 0.7, bty="l", mar=c(3,3,3,3))
 Acf(residuals(VAR_IC)[,1], xlab="",main="e1 vs lags of e1")
